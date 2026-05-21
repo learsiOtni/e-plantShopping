@@ -6,15 +6,18 @@ import { removeItem, updateQuantity } from './CartSlice'
 const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
-  const [totalAmount, setTotalAmount] = useState(0);
 
   // Calculate total amount for all products in the cart
   const calculateTotalAmount = () => {
     let totalAmount = 0;
     cart.forEach( cartItem => {
-        totalAmount += cartItem.cost * cartItem.quantity;
+        totalAmount += parseFloat(cartItem.cost.substring(1)) * cartItem.quantity;
     })
+
+    return totalAmount;
   };
+
+  let totalAmount = calculateTotalAmount();
 
   const handleContinueShopping = (e) => {
    onContinueShopping();
@@ -23,12 +26,12 @@ const CartItem = ({ onContinueShopping }) => {
 
 
   const handleIncrement = (item) => {
-    dispatch(updateQuantity({...item, quantity: quantity++}))
+    dispatch(updateQuantity({ name: item.name, quantity: item.quantity + 1}))
   };
 
   const handleDecrement = (item) => {
     if (item.quantity > 1) {
-        dispatch(updateQuantity({...item, quantity: quantity--}))
+        dispatch(updateQuantity({ name: item.name, quantity: item.quantity - 1}))
     } else {
         dispatch(removeItem(item))
     }
@@ -41,8 +44,10 @@ const CartItem = ({ onContinueShopping }) => {
 
   // Calculate total cost based on quantity for an item
   const calculateTotalCost = (item) => {
-    return (item.quantity * item.cost)
+    return item.quantity * parseFloat(item.cost.substring(1))
   };
+
+  let totalCost
 
   const handleCheckoutShopping = (e) => {
     alert('Functionality to be added for future reference');
@@ -50,7 +55,7 @@ const CartItem = ({ onContinueShopping }) => {
 
   return (
     <div className="cart-container">
-      <h2 style={{ color: 'black' }}>Total Cart Amount: ${calculateTotalAmount()}</h2>
+      <h2 style={{ color: 'black' }}>Total Cart Amount: ${totalAmount}</h2>
       <div>
         {cart.map(item => (
           <div className="cart-item" key={item.name}>
